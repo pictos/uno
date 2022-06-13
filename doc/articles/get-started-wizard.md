@@ -14,22 +14,20 @@ Congratulations, you've just created a new project using the [Uno Platform](http
 ## Common Issues
 The Uno Platform features and support is constantly evolving, but you may encounter some of the  issues below while building your application.
 
-#### WebAssembly: Access to fetch at 'https://XXXX' from origin 'http://XXXX' has been blocked by CORS policy
+#### The XAML editor shows errors
 
-This is a security restriction from the JavaScript `fetch` API, where the endpoint you're calling needs to provide [CORS headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) to work properly.
+If your XAML editor shows one of the following errors:
+- `The type ThemeResource was not found`
+- `The type 'page' does not support direct content`
+- `The type XamlControlsResources was not found`
 
-If you control the API, you'll need to use the features from your framework to enable CORS, and if you don't you'll need to ask the maintainers of the endpoint to enable CORS.
+XAML Intellisense [is not working properly](https://developercommunity.visualstudio.com/content/problem/587980/xaml-intellisense-does-not-use-contentpropertyattr.html) in Visual Studio when the active project is not the `Windows` or `UWP` one. 
 
-To test if CORS is really the issue, you can use [CORS Anywhere](https://cors-anywhere.herokuapp.com/) to proxy the queries.
+To work around this issue, close all XAML editors, open any C# file and select `YourProject.Windows` or `YourProject.UWP` in the top-left drop-down list of the text editor sector. Once selected, re-open the XAML file.
 
 #### error NETSDK1148: A referenced assembly was compiled using a newer version of Microsoft.Windows.SDK.NET.dll.
 
 See [this article](features/winapp-sdk-specifics.md#adjusting-windows-sdk-references) to solve this issue.
-
-#### The XAML editor shows `The type 'page' does not support direct content` message
-XAML Intellisense [is not working properly](https://developercommunity.visualstudio.com/content/problem/587980/xaml-intellisense-does-not-use-contentpropertyattr.html) in Visual Studio when the active project is not the UWP one. 
-
-To work around this issue, close all XAML editors, open a C# file and select 'UWP' in the top-left drop-down list of the text editor sector. Once selected, re-open the XAML file.
 
 #### Error MSB3030: Could not copy the file "MyProject.Shared\MainPage.xbf" because it was not found.
 This issue is present in Visual Studio 17.2 and 17.3 Preview 1 and can be addressed by [taking a look at this issue](https://github.com/unoplatform/uno/discussions/5007#discussioncomment-2583741).
@@ -42,6 +40,14 @@ To fix this issue, build your project once, close the solution and reopen it.
 It is also important to note that Uno uses a multi-project structure, for which each project has to be build individually for errors to disapear from the **Error List** window (notice the **Project** column values).
 
 In order to clear the **Error List** window, build the whole solution completely once. Thereafter, build a specific project and prefer the use of the **Output** tool window (in the menu **View** -> **Output**), taking build messages by order of appearance.
+
+#### WebAssembly: Access to fetch at 'https://XXXX' from origin 'http://XXXX' has been blocked by CORS policy
+
+This is a security restriction from the JavaScript `fetch` API, where the endpoint you're calling needs to provide [CORS headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) to work properly.
+
+If you control the API, you'll need to use the features from your framework to enable CORS, and if you don't you'll need to ask the maintainers of the endpoint to enable CORS.
+
+To test if CORS is really the issue, you can use [CORS Anywhere](https://cors-anywhere.herokuapp.com/) to proxy the queries.
 
 #### Event handler cannot be added automatically
 

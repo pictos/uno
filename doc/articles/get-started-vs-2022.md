@@ -6,7 +6,7 @@ This getting started will guide you through the creation of an Uno Platform App 
 > This guide covers development on Windows using Visual Studio. If you want to use another environment or IDE, see our [general getting started](get-started.md).
 
 > [!IMPORTANT] 
-> Microsoft's Visual Studio support for mobile targets is currently in preview. As of Uno 4.3, .NET 6.0.300 Mobile is supported with Visual Studio 2022 17.3 Preview 1 or later. To use Xamarin (as opposed to .NET 6 Mobile) and Visual Studio 2022 stable or 2019, [follow this guide](get-started-vs.md).
+> Microsoft's Visual Studio support for mobile targets is currently in preview. As of Uno 4.3, .NET 6.0.300 Mobile is supported with Visual Studio 2022 17.3 Preview 1.1 or later. To use Xamarin (as opposed to .NET 6 Mobile) and Visual Studio 2022 stable or 2019, [follow this guide](get-started-vs.md).
 
 ## Prerequisites
 To create Uno Platform applications you will need [**Visual Studio 2022 17.3 (Preview 1.1 or later)**](https://visualstudio.microsoft.com/vs/preview/):
@@ -18,6 +18,10 @@ To create Uno Platform applications you will need [**Visual Studio 2022 17.3 (Pr
 1. **.NET Multi-platform App UI development** workload installed.
 
     ![visual-studio-installer-dotnet-mobile](Assets/quick-start/vs-install-dotnet-mobile.png)
+
+1. Once .NET Multi-platform is selected, check the **Xamarin SDKS** on the right side:
+
+    ![visual-studio-installer-dotnet-mobile](Assets/quick-start/vs-install-2022-xamarin.png)
 
 1. **.NET desktop development** workload installed.
 
