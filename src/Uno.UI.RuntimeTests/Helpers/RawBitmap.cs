@@ -25,10 +25,18 @@ namespace Uno.UI.RuntimeTests.Helpers
 	{
 		private byte[]? _pixels;
 
-		public RawBitmap(RenderTargetBitmap bitmap, UIElement renderedElement)
+		private RawBitmap(RenderTargetBitmap bitmap, UIElement renderedElement)
 		{
 			Bitmap = bitmap;
 			RenderedElement = renderedElement;
+		}
+
+		public static async Task<RawBitmap> From(RenderTargetBitmap bitmap, UIElement renderedElement)
+		{
+			var raw = new RawBitmap(bitmap, renderedElement);
+			await raw.Populate();
+
+			return raw;
 		}
 
 		public Size Size => new(Bitmap.PixelWidth, Bitmap.PixelHeight);
@@ -42,7 +50,7 @@ namespace Uno.UI.RuntimeTests.Helpers
 		public UIElement RenderedElement { get; }
 
 		public RenderTargetBitmap Bitmap { get; }
-	
+
 		public Color GetPixel(int x, int y)
 		{
 			if(_pixels is null)

@@ -11,6 +11,7 @@ using static Private.Infrastructure.TestServices;
 using ImageBrush = Windows.UI.Xaml.Media.ImageBrush;
 using Grid = Windows.UI.Xaml.Controls.Grid;
 using Rectangle = Windows.UI.Xaml.Shapes.Rectangle;
+using System.Linq;
 
 namespace Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media
 {
@@ -18,87 +19,70 @@ namespace Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media
 	[RunsOnUIThread]
 	public class Given_ImageBrushStretch
 	{
-		private const string Redish = "#FFEB1C24";
-		private const string Yellowish = "#FFFEF200";
-		private const string Greenish = "#FF0ED145";
-		private const string White = "#FFFFFFFF";
-
-		private const double Width = 50;
-		private const double Height = 50;
-		private const double CenterX = 25;
-		private const double CenterY = 25;
-
-
-
-#if __SKIA__
+#if __SKIA__ // todo: add other platforms here, and/or which platform it was disabled and why
 		[TestMethod]
 		[RunsOnUIThread]
+		[DataRow(Stretch.Fill)]
+		[DataRow(Stretch.UniformToFill)]
+		//[DataRow(Stretch.Uniform)] // todo: explain why we disable for skia
+		[DataRow(Stretch.None)]
 
-		public async Task When_Stretch()
+		public async Task When_Stretch_Asd123(Stretch stretch)
 		{
+			const string Redish = "#FFEB1C24";
+			const string Yellowish = "#FFFEF200";
+			const string Greenish = "#FF0ED145";
+			const string White = "#FFFFFFFF";
 
-			ImageBrush brush = new ImageBrush();
-
-			var SUT = new Grid()
+			var brush = new ImageBrush
 			{
-				Height = Height,
-				Width = Width,
+				ImageSource = new Uri("ms-appx:///Assets/colored-ellipse.jpg"),
 			};
-
-			SUT.Background = brush;
-			brush.Stretch = Stretch.Fill;
-			
-			TestServices.WindowHelper.WindowContent = SUT;			
+			var SUT = new Border
+			{
+				Width = 100,
+				Height = 100,
+				BorderThickness = new Thickness(2),
+				BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 0, 0)),
+				Background = brush,
+			};
+			WindowHelper.WindowContent = SUT;
 			WindowHelper.WaitForLoaded(SUT);
 
 			var renderer = new RenderTargetBitmap();
-			var fill = new RawBitmap(renderer, SUT);
-			await renderer.RenderAsync(SUT);
-			
-			await TestServices.WindowHelper.WaitForIdle();
-			await TestServices.WindowHelper.WaitForIdle();
+			const float BorderOffset = 8;
+			float width = (float)SUT.Width, height = (float)SUT.Height;
+			float centerX = width / 2, centerY = height / 2;
 
-			// All edges are red-ish
-			await ImageAssert.HasColorAtChild(fill, SUT, CenterX, Height - 1, Yellowish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(fill, SUT, CenterX, 1, Redish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(fill, SUT,  1, CenterY, Redish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(fill, SUT, Width - 1, CenterY, Redish, tolerance: 5);
+			var expectations = stretch switch
+			{
+				// All edges are red-ish
+				Stretch.Fill => (Top: Redish, Bottom: Redish, Left: Redish, Right: Redish),
+				// Top and bottom are red-ish. Left and right are yellow-ish
+				Stretch.UniformToFill => (Top: Redish, Bottom: Redish, Left: Yellowish, Right: Yellowish),
+				// Top and bottom are same as backround. Left and right are red-ish
+				Stretch.Uniform => (Top: White, Bottom: White, Left: Redish, Right: Redish),
+				// Everything is green-ish
+				Stretch.None => (Top: Greenish, Bottom: Greenish, Left: Greenish, Right: Greenish),
 
-			brush.Stretch = Stretch.UniformToFill;
-			await WindowHelper.WaitForIdle();
-			await renderer.RenderAsync(SUT);
-			var uniFill = new RawBitmap(renderer, SUT);
-			await WindowHelper.WaitForIdle();
+				_ => throw new ArgumentOutOfRangeException($"unexpected stretch: {stretch}"),
+			};
 
-			// Top and bottom are red-ish. Left and right are yellow-ish
-			await ImageAssert.HasColorAtChild(uniFill, SUT, CenterX, Height - 1, Redish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(uniFill, SUT, CenterX, 1, Redish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(uniFill, SUT, 1, CenterY, Yellowish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(uniFill, SUT, Width - 1, CenterY, Yellowish, tolerance: 5);
+			var bitmap = await UpdateStretchAndScreenshot(stretch);
+			ImageAssert.HasColorAt(bitmap, centerX, BorderOffset, expectations.Top, tolerance: 5);
+			ImageAssert.HasColorAt(bitmap, centerX, height - BorderOffset, expectations.Bottom, tolerance: 5);
+			ImageAssert.HasColorAt(bitmap, BorderOffset, centerY, expectations.Left, tolerance: 5);
+			ImageAssert.HasColorAt(bitmap, width - BorderOffset, centerY, expectations.Right, tolerance: 5);
 
-			brush.Stretch = Stretch.UniformToFill;
-			await WindowHelper.WaitForIdle();
-			await renderer.RenderAsync(SUT);
-			var uniform = new RawBitmap(renderer, SUT);
-			await WindowHelper.WaitForIdle();
+			async Task<RawBitmap> UpdateStretchAndScreenshot(Stretch stretch)
+			{
+				brush.Stretch = stretch;
 
-			// Top and bottom are same as backround. Left and right are red-ish
-			await ImageAssert.HasColorAtChild(uniform, SUT, CenterX, Height + 1, White, tolerance: 5);
-			await ImageAssert.HasColorAtChild(uniform, SUT, CenterX, 1, White, tolerance: 5);//Test devrait plante true white
-		    await ImageAssert.HasColorAtChild(uniform, SUT, 1, CenterY, Redish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(uniform,SUT, Width - 1, CenterY, Redish, tolerance: 5);
+				await WindowHelper.WaitForIdle();
+				await renderer.RenderAsync(SUT);
 
-			brush.Stretch = Stretch.None;
-			await WindowHelper.WaitForIdle();
-			await renderer.RenderAsync(SUT);
-			var none = new RawBitmap(renderer, SUT);
-			await WindowHelper.WaitForIdle();
-
-			// Everything is green-ish
-			await ImageAssert.HasColorAtChild(none, SUT, CenterX, Height - 1, Greenish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(none, SUT, CenterX, 1, Greenish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(none, SUT, 1, CenterY, Greenish, tolerance: 5);
-			await ImageAssert.HasColorAtChild(none, SUT, Width - 1, CenterY, Greenish, tolerance: 5);
+				return await RawBitmap.From(renderer, SUT);
+			}
 		}
 #endif
 	}
