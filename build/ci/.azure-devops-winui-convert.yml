@@ -28,8 +28,8 @@ jobs:
     parameters:
       nugetPackages: $(NUGET_PACKAGES)
 
-  - template: templates/dotnet-install.yml
   - template: templates/dotnet6-install-windows.yml
+  - template: templates/dotnet-install.yml
   - template: templates/install-windows-sdk.yml
 
   - powershell: |
