@@ -52,6 +52,8 @@ jobs:
       createLogFile: false
 
   - powershell: |
+        git config --global user.email "ci@ci.com"
+        git config --global user.name "ci"
         git add .
         git commit -m "temporary commit for cleanup"
         # Remove all non-source files to avoid cross-OS oddities.
