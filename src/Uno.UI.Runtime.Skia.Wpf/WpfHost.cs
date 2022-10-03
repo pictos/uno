@@ -199,7 +199,7 @@ namespace Uno.UI.Skia.Platform
 			InvalidateVisual();
 		}
 
-		private void MainWindow_Closing(object sender, CancelEventArgs e)
+		private void MainWindow_Closing(object? sender, CancelEventArgs e)
 		{
 			var manager = SystemNavigationManagerPreview.GetForCurrentView();
 			if (!manager.HasConfirmedClose)
